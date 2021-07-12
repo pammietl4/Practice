@@ -1,0 +1,44 @@
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('Conitionos Download')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/maven.git'
+            }
+        }
+         stage('Conitionos Build')
+        {
+            steps
+            {
+                sh 'mvn package'
+            }
+        }
+         stage('Conitionos Deployment')
+        {
+            steps
+            {
+                sh 'scp /home/ubuntu/.jenkins/workspace/cinema/webapp/target/webapp.war ubuntu@172.31.0.255:/var/lib/tomcat8/webapps/cinema-dev.war'
+            }
+        }
+         stage('Conitionos Testing')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/FunctionalTesting.git'
+                sh 'java -jar /home/ubuntu/.jenkins/workspace/cinema/testing.jar'
+            }
+        }
+         stage('Conitionos Delivery')
+        {
+            steps
+            {
+                sh 'scp /home/ubuntu/.jenkins/workspace/cinema/webapp/target/webapp.war ubuntu@172.31.9.186:/var/lib/tomcat8/webapps/cinema-prod.war'
+            }
+        }
+        
+    }
+}
