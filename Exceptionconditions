@@ -1,0 +1,99 @@
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('Continous Download')
+        {
+            steps
+            {
+                script
+                {
+                  try
+                  {
+                    git 'https://github.com/intelliqittrainings/maven.git'
+                  }
+                  catch(Exception e1)
+                  {
+                    mail bcc: '', body: '', cc: '', from: '', replyTo: '', subject: 'Unable to Download the code', to: 'gitadmin@gmail.com'
+                  }
+                
+                }
+            }
+        }
+        stage('Continous Build')
+        {
+            steps
+            {
+                script
+                {
+                  try
+                  {
+                    sh 'mvn package'
+                  }
+                  catch(Exception e1)
+                  {
+                    mail bcc: '', body: '', cc: '', from: '', replyTo: '', subject: 'Unable to Build the code', to: 'mavenadmin@gmail.com'
+                  }
+                
+                }
+            }
+        }
+        stage('Continous Deployment')
+        {
+            steps
+            {
+                script
+                {
+                  try
+                  {
+                    sh 'scp /home/ubuntu/.jenkins/workspace/Exceptionconditions/webapp/target/webapp.war ubuntu@172.31.0.255:/var/lib/tomcat8/webapps/excep-dev.war'
+                  }
+                  catch(Exception e1)
+                  {
+                    mail bcc: '', body: '', cc: '', from: '', replyTo: '', subject: 'Unable to Deploy the code', to: 'deployadmin@gmail.com'
+                  }
+                
+                }
+            }
+        }
+        stage('Continous Testing')
+        {
+            steps
+            {
+                script
+                {
+                  try
+                  {
+                    git 'https://github.com/intelliqittrainings/FunctionalTesting.git'
+                    sh 'java -jar /home/ubuntu/.jenkins/workspace/Exceptionconditions/testing.jar'
+                  }
+                  catch(Exception e1)
+                  {
+                    mail bcc: '', body: '', cc: '', from: '', replyTo: '', subject: 'Unable to Test the code', to: 'testadmin@gmil.com'
+                  }
+                
+                }
+            }
+        }
+        stage('Continous Delivery')
+        {
+            steps
+            {
+                script
+                {
+                  try
+                  {
+                    sh 'scp /home/ubuntu/.jenkins/workspace/Exceptionconditions/webapp/target/webapp.war ubuntu@172.31.9.186:/var/lib/tomcat8/webapps/excep-prod.war'
+                  }
+                  catch(Exception e1)
+                  {
+                    mail bcc: '', body: '', cc: '', from: '', replyTo: '', subject: 'Unable to Deploy the code', to: 'deployadmin@gmail.com'
+                  }
+                
+                }
+            }
+        }
+        
+    }
+}
